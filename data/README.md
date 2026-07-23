@@ -10,7 +10,7 @@ unzip data/W-I-S1.zip -d data/
 
 ## Full dataset suite
 
-The six datasets (ICEWS-WIKI S1/S2, ICEWS-YAGO S1/S2, DrugBank-WIKI, UMLS-WIKI, OpenAlex-DBpedia, Crunchbase-DBpedia) follow the DKGF-Bench release. Download links will be provided here; in the meantime, please contact the authors for access.
+The six datasets (ICEWS-WIKI S1/S2, ICEWS-YAGO S1/S2, DrugBank-WIKI, UMLS-WIKI, OpenAlex-DBpedia, Crunchbase-DBpedia) follow the DKGF-Bench release. Download links will be provided here [Link](https://github.com/eduzrh/DKGF_1).
 
 ## File format
 
