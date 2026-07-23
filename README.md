@@ -280,27 +280,7 @@ Expected runtime: roughly 1 hour per encoder on a modern 24GB GPU.
 
 [MIT License](LICENSE) - Copyright notices preserved.
 
-## 📬 Contact
 
-- **Email**: [runhaozhao@nudt.edu.cn](mailto:runhaozhao@nudt.edu.cn)
-- **GitHub Issues**: For technical concerns, create an Issue in the [GitHub repository](https://github.com/eduzrh/Tail_DKGF/issues). Labels: `bug`, `enhancement`, `question`.
-
-Responses targeted within 2-3 business days.
-
-## 📑 Citation
-
-If you find this work helpful for your research or applications, we would appreciate it if you could cite our paper (under review):
-
-```bibtex
-@article{tailDKGF2027,
-  author  = {Anonymous Author(s)},
-  title   = {Degree-Adaptive Graph Rewiring for Long-Tail Domain-Specific Knowledge Graph Fusion},
-  journal = {Under review},
-  year    = {2026}
-}
-```
-
----
 
 ## 🙏 Acknowledgement
 
