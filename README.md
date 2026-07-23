@@ -1,6 +1,6 @@
 <div align="center">
 
-# ✨ DAGeR: Degree-Adaptive Graph Rewiring for Long-Tail Domain-Specific Knowledge Graph Fusion ✨
+# ✨ Taming the Long-Tail: Degree-Adaptive Graph Rewiring for Domain-Specific Knowledge Graph Fusion ✨
 
 [![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/eduzrh/Tail_DKGF)
 [![Language: Python 3](https://img.shields.io/badge/Language-Python3-blue.svg?style=flat-square)](https://www.python.org/)
@@ -28,7 +28,7 @@
 
 | 🆕 Updates          | 📅 Date | 📝 Description                            |
 | ------------------- | ------- | ----------------------------------------- |
-| 🎉 **Code Release** | -       | DAGeR codebase and example dataset now available |
+| 🎉 **Code Release** | -       | DAGR codebase and example dataset now available |
 
 > **Before running:** After cloning, unzip the bundled example dataset: `unzip data/W-I-S1.zip -d data/`.
 
@@ -38,7 +38,7 @@
 
 **Domain-specific knowledge graph fusion (DKGF)** aims to mine highly relevant knowledge from general knowledge graphs (GKGs, e.g., Wikidata, YAGO, DBpedia) to enrich the coverage of domain-specific knowledge graphs (DKGs, e.g., ICEWS, DrugBank, UMLS). In real-world DKGF, a large fraction of the entities to be fused are **long-tail entities** whose endpoint connectivity is extremely sparse, which makes fusion suffer from two fundamental bottlenecks: **identity ambiguity** (the impoverished neighborhood of a long-tail GKG entity cannot reliably determine whether it is relevant to the target domain) and **integration uncertainty** (candidate cross-graph links for sparse entities are noisy and hard to verify).
 
-We propose **DAGeR**, a **degree-adaptive graph rewiring** paradigm specifically tailored for long-tail DKGF. Instead of passively accepting the structurally impoverished raw neighborhood distributions, DAGeR dynamically reconstructs optimal latent structural paths to bridge isolated entities from the GKG to the DKG, and injects the rewired topology into the base KG encoder through a degree-adaptive dual-track fusion mechanism.
+We propose **DAGR**, a **degree-adaptive graph rewiring** paradigm specifically tailored for long-tail DKGF. Instead of passively accepting the structurally impoverished raw neighborhood distributions, DAGR dynamically reconstructs optimal latent structural paths to bridge isolated entities from the GKG to the DKG, and injects the rewired topology into the base KG encoder through a degree-adaptive dual-track fusion mechanism.
 
 ## 🔥 Key Features
 
@@ -54,7 +54,7 @@ We propose **DAGeR**, a **degree-adaptive graph rewiring** paradigm specifically
 
 ## 🏗️ Architecture
 
-DAGeR consists of four key modules:
+DAGR consists of four key modules:
 
 **Module 1: Degree-Aware Expansion Knowledge Generation** 🔄
 Applies a degree-aware expansion operator to augment the local structural context of long-tail GKG entities, followed by information-theoretic context purging (IDF-weighted signatures).
