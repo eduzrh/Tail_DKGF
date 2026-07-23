@@ -17,8 +17,7 @@
  📖 <a href="#-usage">Usage</a> |
  🔬 <a href="#-reproducibility">Reproducibility</a> |
  📜 <a href="#-license">License</a> |
- 📬 <a href="#-contact">Contact</a> |
- 📑 <a href="#-citation">Citation</a>
+
 </p>
 
 </div>
