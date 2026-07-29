@@ -262,7 +262,6 @@ The degree buckets (`0-1`, `2`, `3`, `4`, `ALL_longtail`, `>=5`) are then evalua
 ## 🔬 Reproducibility
 
 - **Hyperparameters**: All settings are exposed as command-line arguments; the default configuration matches the paper (dim=128, K=16, T=3, TransE base scorer, Adam optimizer).
-- **Random Seeds**: Fixed via `--seed` (default 2025).
 - **Environment**: Tested on Python 3.10, PyTorch >= 1.12, NVIDIA RTX 4090 GPUs.
 
 To reproduce the plug-and-play benchmark on W-I-S1:
@@ -271,7 +270,6 @@ To reproduce the plug-and-play benchmark on W-I-S1:
 bash scripts/run_all.sh
 ```
 
-Expected runtime: roughly 1 hour per encoder on a modern 24GB GPU.
 
 ---
 
