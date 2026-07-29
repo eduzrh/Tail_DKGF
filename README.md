@@ -114,7 +114,7 @@ We evaluate on six datasets from **DKGF-Bench**, covering four domains. Each dat
 | Academic   | OpenAlex-DBpedia   | OpenAlex   | DBpedia  | 2,105,340    |
 | Business   | Crunchbase-DBpedia | Crunchbase | DBpedia  | 642,109      |
 
-An example dataset (**W-I-S1**) is bundled with this repository (`data/W-I-S1.zip`). The full dataset suite follows the DKGF-Bench release; see [data/README.md](data/README.md) for the file format and download instructions.
+An example dataset (**W-I-S1**) is bundled with this repository (`data/W-I-S1.zip`). The full dataset suite follows the DKGF-Bench release; an example dataset is provided in `data/W-I-S1.zip`.
 
 **Dataset format** — each dataset folder (e.g., `data/W-I-S1/`) contains:
 
