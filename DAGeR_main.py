@@ -1,22 +1,5 @@
 #!/usr/bin/env python3
-"""
-DAGeR v13: DB-Optimized Iterative Feedback Refinement
-===========================================================
-v12 -> v13: DB-inspired runtime optimizations from the literature:
 
-  1. EDDY GATE (Avnur SIGMOD 2000): delta-driven early termination
-     If |S_struct - S_emb| < epsilon for all entities after round r, skip r+1.
-
-  2. PROGRESSIVE REFINEMENT (Papadakis ICDE 2023 Sec IV-B):
-     Round-aware delta threshold narrowing: eps1=0.15 -> eps2=0.05.
-     Only entities with delta>eps_r are recomputed.
-
-  3. RUNTIME DYNAMIC OPTIMIZATION (SIGMOD 2023):
-     Cache anchor embeddings once per batch (was 3x redundant lookup).
-     Pre-pad bridge_w once (was 3x padding).
-
-Expected speedup: 35-45% per epoch (140s -> ~90s)
-"""
 import os, math, time, argparse, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dager_core import (IDFWeightedSignatures, ParametricSimulation, MultiConstraintBridge,
