@@ -72,8 +72,8 @@ Injects the rewired topology into the base encoder through a degree-adaptive dua
 
 **Code organization:**
 
-- `DAGeR_main.py`: Main training/inference entry (full pipeline with iterative refinement)
-- `dager_core.py`: All four modules, encoder registry, and the data pipeline
+- `DAGR_main.py`: Main training/inference entry (full pipeline with iterative refinement)
+- `dagr_core.py`: All four modules, encoder registry, and the data pipeline
 - `fusion_eval.py`: Final evaluation (Entity Discovery + Fusion Triple metrics)
 - `tools/`: Degree statistics and long-tail bucket extraction utilities
 - `scripts/`: One-command experiment scripts
@@ -154,7 +154,7 @@ bash scripts/run_quick_test.sh
 ### Step 4: Full Training 🏋️
 
 ```bash
-python DAGeR_main.py \
+python DAGR_main.py \
     --data_dir data/W-I-S1 \
     --name W-I-S1 \
     --output_dir outputs \
@@ -220,7 +220,7 @@ This reports:
 **Adding your own encoder:**
 
 ```python
-# In dager_core.py, add a new scorer class:
+# In dagr_core.py, add a new scorer class:
 class MyScorer(BaseKGScorer):
     def score(self, he, re, te):
         sc = he + re - te
@@ -235,10 +235,10 @@ SCORER_REGISTRY["my_encoder"] = MyScorer
 
 ```bash
 # Remove the multi-constraint virtual link refining (anchor bridges)
-python DAGeR_main.py ... --ablation no_bridge
+python DAGR_main.py ... --ablation no_bridge
 
 # Embedding-only track (disable the structural track in the hybrid injector)
-python DAGeR_main.py ... --ablation emb_only
+python DAGR_main.py ... --ablation emb_only
 
 # Or run the whole suite:
 bash scripts/run_ablation.sh data/W-I-S1 W-I-S1

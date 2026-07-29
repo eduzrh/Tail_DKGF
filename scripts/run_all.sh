@@ -1,5 +1,5 @@
 #!/bin/bash
-# DAGeR: Batch run all encoders on W-I-S1 (plug-and-play benchmark)
+# DAGR: Batch run all encoders on W-I-S1 (plug-and-play benchmark)
 # Usage: bash scripts/run_all.sh   (from the repo root)
 set -e
 
@@ -11,7 +11,7 @@ EPOCHS=30
 BS=256
 
 echo "============================================"
-echo "DAGeR: Plug-and-Play Encoder Benchmark"
+echo "DAGR: Plug-and-Play Encoder Benchmark"
 echo "Dataset: $NAME | Epochs: $EPOCHS | Dim: $DIM"
 echo "============================================"
 
@@ -19,7 +19,7 @@ for SCORER in transe transh gnn exefuse; do
     OUT_DIR="outputs_${SCORER}"
     echo ""
     echo ">>> Running: --scorer $SCORER -> $OUT_DIR"
-    python DAGeR_main.py \
+    python DAGR_main.py \
         --data_dir "$DATA_DIR" \
         --name "$NAME" \
         --output_dir "$OUT_DIR" \

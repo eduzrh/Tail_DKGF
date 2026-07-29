@@ -2,7 +2,7 @@
 
 import os, math, time, argparse, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from dager_core import (IDFWeightedSignatures, ParametricSimulation, MultiConstraintBridge,
+from dagr_core import (IDFWeightedSignatures, ParametricSimulation, MultiConstraintBridge,
                        read_triples, build_ent_rel_mappings, compute_node_degrees, set_seed,
                        FusionDataset, collate_fn, NegativeSampler,
                        GMCBlock, DomainGate, BaseKGScorer, TransEScorer, RotatEScorer, ExeFuseScorer, SCORER_REGISTRY,
@@ -165,7 +165,7 @@ class StructuralEnhancement(nn.Module):
         return S_fused, ss[-1], es[-1], base_alpha
 
 
-class DAGeR_v13(nn.Module):
+class DAGR_v13(nn.Module):
     def __init__(self, ne, nr, dim=128, max_k=8, dropout=0.1,
                  lambda_bridge=0.2, scorer='transe', n_rounds=3):
         super().__init__()
@@ -255,7 +255,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
     set_seed(seed)
     os.makedirs(out_dir, exist_ok=True)
     print(f"\n{'='*60}")
-    print(f"DAGeR v13 | {name} | dim={dim} max_k={max_k} n_rounds={n_rounds}")
+    print(f"DAGR v13 | {name} | dim={dim} max_k={max_k} n_rounds={n_rounds}")
     print(f"  DB-Optimized Iterative Feedback | ablation={ablation or 'none'}")
     print(f"{'='*60}")
     t0 = time.time()
@@ -315,7 +315,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
     print(f"  Train={len(tr_ds)} (LT={lttr}) Test={len(te_ds)} (LT={ltte})")
 
     if ablation == 'emb_only': lambda_bridge = 0.0
-    model = DAGeR_v13(len(e2i), len(r2i), dim=dim, max_k=max_k,
+    model = DAGR_v13(len(e2i), len(r2i), dim=dim, max_k=max_k,
                       lambda_bridge=lambda_bridge, scorer=scorer,
                       n_rounds=n_rounds).to(dev)
     if ablation in ('no_bridge',): model.set_bridge(None)
@@ -374,7 +374,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
     print(f"{'='*60}\n")
     res_path = os.path.join(out_dir, f"results_{name}.txt")
     with open(res_path, 'w') as f:
-        f.write(f"DAGeR v13 | {name} | dim={dim} max_k={max_k} n_rounds={n_rounds}\n")
+        f.write(f"DAGR v13 | {name} | dim={dim} max_k={max_k} n_rounds={n_rounds}\n")
         f.write(f"BEST: ACC={best_res['acc']:.4f} F1={best_res['f1']:.4f} tau={best_res.get('tau',0):.4f}\n")
         for k in ['lt','hd']:
             if f'{k}_f1' in best_res:
@@ -389,7 +389,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
 
 
 if __name__ == '__main__':
-    p = argparse.ArgumentParser(description='DAGeR v13: DB-Optimized Iterative Feedback')
+    p = argparse.ArgumentParser(description='DAGR v13: DB-Optimized Iterative Feedback')
     p.add_argument('--data_dir', type=str, required=True)
     p.add_argument('--name', type=str, default='dataset')
     p.add_argument('--output_dir', type=str, default='./outputs')

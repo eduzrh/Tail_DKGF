@@ -92,7 +92,7 @@ def init_bert_scorer_weights(scorer, data_dir, ent2idx, rel2idx, bert_path, devi
     dim = scorer.ent.embedding_dim
     ds_tag = os.path.basename(os.path.normpath(data_dir))
     bert_tag = hashlib.md5(os.path.abspath(bert_path).encode()).hexdigest()[:8]
-    cache_dir = os.path.join(os.path.dirname(bert_path), 'dager_bert_cache')
+    cache_dir = os.path.join(os.path.dirname(bert_path), 'dagr_bert_cache')
     os.makedirs(cache_dir, exist_ok=True)
     cache_path = os.path.join(cache_dir, f'{ds_tag}_d{dim}_{bert_tag}.pt')
 
@@ -736,7 +736,7 @@ class GNNScorer(BaseKGScorer):
     
     Simulates 1-hop graph convolution: entity = self_proj + gate * neighbor_msg.
     Relation acts as a gating mechanism on cross-entity messages.
-    Preserves DAGeR plug-and-play interface -- no external graph needed.
+    Preserves DAGR plug-and-play interface -- no external graph needed.
     """
     def __init__(self, ne, nr, dim, dropout=0.1):
         super().__init__(ne, nr, dim, dropout)
@@ -852,7 +852,7 @@ class DomainGate(nn.Module):
 
 
 class StructuralEnhancement(nn.Module):
-    """DAGeR structural enhancement: wraps any BaseKGScorer.
+    """DAGR structural enhancement: wraps any BaseKGScorer.
     
     Adds to any base KG model:
       - GMC: mutual consistency refinement of (h,t) embeddings
@@ -959,19 +959,19 @@ class StructuralEnhancement(nn.Module):
 
 
 # ---------------------------------------------------------------------------
-# 5.5 DAGeR Full Model (thin wrapper: BaseKGScorer + StructuralEnhancement)
+# 5.5 DAGR Full Model (thin wrapper: BaseKGScorer + StructuralEnhancement)
 # ---------------------------------------------------------------------------
 
-class DAGeR_v6(nn.Module):
-    """DAGeR v6: Pluggable encoder-agnostic KG fusion.
+class DAGR_v6(nn.Module):
+    """DAGR v6: Pluggable encoder-agnostic KG fusion.
     
     Architecture:
-      DAGeR = BaseKGScorer (any model) + StructuralEnhancement (DAGeR's core)
+      DAGR = BaseKGScorer (any model) + StructuralEnhancement (DAGR's core)
     
     Usage:
-      model = DAGeR_v6(ne, nr, dim, scorer='transe')   # TransE
-      model = DAGeR_v6(ne, nr, dim, scorer='rotate')   # RotatE
-      model = DAGeR_v6(ne, nr, dim, scorer='exefuse')  # ExeFuse
+      model = DAGR_v6(ne, nr, dim, scorer='transe')   # TransE
+      model = DAGR_v6(ne, nr, dim, scorer='rotate')   # RotatE
+      model = DAGR_v6(ne, nr, dim, scorer='exefuse')  # ExeFuse
     """
 
     def __init__(self, ne: int, nr: int, dim: int = 128, max_k: int = 8,
@@ -987,7 +987,7 @@ class DAGeR_v6(nn.Module):
             raise ValueError(f"Unknown scorer '{scorer}'. Available: {list(SCORER_REGISTRY.keys())}")
         self.scorer = SCORER_REGISTRY[scorer](ne, nr, dim, dropout)
 
-        # Structural enhancement (DAGeR's core)
+        # Structural enhancement (DAGR's core)
         self.enhance = StructuralEnhancement(dim, max_k, dropout, lambda_bridge)
 
     def set_bridge(self, bridge):
@@ -1355,7 +1355,7 @@ def apply_feedback(m2, m3, entity_alpha, per_degree_stats, gkg_degrees):
 def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
         lr=0.001, seed=2025, lambda_bridge=0.2, beta_entropy=0.01,
         expansion_thresh=2, ablation=None, scorer='transe'):
-    """DAGeR v6 full pipeline.
+    """DAGR v6 full pipeline.
     
     Phase I (no GPU needed): M1 IDF signatures → M2 Parametric simulation → M3 Bridge weighting
     Phase II (GPU): M4 Dual-track fusion model training
@@ -1367,7 +1367,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
     os.makedirs(out_dir, exist_ok=True)
 
     print(f"\n{'='*60}")
-    print(f"DAGeR v6 | {name} | dim={dim} max_k={max_k} lambda={lambda_bridge}")
+    print(f"DAGR v6 | {name} | dim={dim} max_k={max_k} lambda={lambda_bridge}")
     print(f"  4 Modules x 7 Steps | B/C dual-track: S_struct + S_emb")
     print(f"  Ablation: {ablation or 'none (full model)'}")
     print(f"{'='*60}")
@@ -1457,7 +1457,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
     elif ablation == 'struct_only':
         lambda_bridge = 0.0  # still need bridge for struct signal
 
-    model = DAGeR_v6(len(e2i), len(r2i), dim=dim, max_k=max_k,
+    model = DAGR_v6(len(e2i), len(r2i), dim=dim, max_k=max_k,
                      lambda_bridge=lambda_bridge, scorer=scorer).to(dev)
 
     if ablation in ('no_bridge', 'random_bridge'):
@@ -1467,7 +1467,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
 
     n_params = sum(p.numel() for p in model.parameters())
     n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"  [M4] DAGeR v6: {n_params:,} params ({n_trainable} trainable: "
+    print(f"  [M4] DAGR v6: {n_params:,} params ({n_trainable} trainable: "
           f"tau, alpha, GMC, DomainGate, embeddings)")
 
     # Initialize tau based on class balance
@@ -1541,7 +1541,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
     # ---- Save results ----
     res_path = os.path.join(out_dir, f"results_{name}.txt")
     with open(res_path, 'w') as f:
-        f.write(f"DAGeR v6 | {name} | dim={dim} max_k={max_k} lambda={lambda_bridge}\n")
+        f.write(f"DAGR v6 | {name} | dim={dim} max_k={max_k} lambda={lambda_bridge}\n")
         f.write(f"Ablation: {ablation or 'none'}\n")
         f.write(f"BEST: ACC={best_res['acc']:.4f} P={best_res['prec']:.4f} "
                 f"R={best_res['rec']:.4f} F1={best_res['f1']:.4f} "
@@ -1577,7 +1577,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
 # =====================================================================
 
 if __name__ == '__main__':
-    p = argparse.ArgumentParser(description='DAGeR v6: Domain-Aware Graph Rewiring')
+    p = argparse.ArgumentParser(description='DAGR v6: Domain-Aware Graph Rewiring')
     p.add_argument('--data_dir', type=str, required=True,
                    help='Path to dataset dir containing triples_1, triples_2, etc.')
     p.add_argument('--name', type=str, default='dataset',

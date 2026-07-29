@@ -1,5 +1,5 @@
 #!/bin/bash
-# DAGeR: Ablation study on one dataset
+# DAGR: Ablation study on one dataset
 # Usage: bash scripts/run_ablation.sh [DATA_DIR] [NAME]
 set -e
 
@@ -17,12 +17,12 @@ for ABL in full no_bridge emb_only; do
     OUT_DIR="outputs_abl_${ABL}"
     echo ">>> Ablation: $ABL -> $OUT_DIR"
     if [ "$ABL" = "full" ]; then
-        python DAGeR_main.py \
+        python DAGR_main.py \
             --data_dir "$DATA_DIR" --name "$NAME" --output_dir "$OUT_DIR" \
             --dim $DIM --max_k $MAX_K --epochs $EPOCHS --batch_size $BS \
             --scorer transe
     else
-        python DAGeR_main.py \
+        python DAGR_main.py \
             --data_dir "$DATA_DIR" --name "$NAME" --output_dir "$OUT_DIR" \
             --dim $DIM --max_k $MAX_K --epochs $EPOCHS --batch_size $BS \
             --scorer transe --ablation "$ABL"
