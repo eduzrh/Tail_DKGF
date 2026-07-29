@@ -133,11 +133,6 @@ An example dataset (**W-I-S1**) is bundled with this repository (`data/W-I-S1.zi
 
 ### Step 1: Clone the Repository 📥
 
-```bash
-git clone https://github.com/eduzrh/Tail_DKGF.git
-cd Tail_DKGF
-```
-
 ### Step 2: Prepare the Example Dataset 📦
 
 ```bash
