@@ -1,19 +1,5 @@
 #!/usr/bin/env python3
-"""
-DAGeR v6: Domain-Aware Graph Rewiring for Knowledge Graph Fusion
-=================================================================
-4 Modules x 7 Steps. B/C dual-track: S_struct (Track B, zero-shot)
-+ S_emb (Track C, learnable). Fused via learnable alpha.
 
-Core papers adapted:
-  [M1] ICDE 2023 Papadakis et al. - Blocking + IDF weighting + Block Purging
-  [M2] SIGMOD 2024 Arroyuelo et al. - LTJ worst-case-optimal intersection
-        ICDE 2022 Fan et al.        - Parametric simulation (degree-adaptive)
-        CIKM 2021 Yang et al.       - Global matching consensus filter
-  [M3] ICDE 2023 Papadakis et al. - ARCS/CBS/ECBS weighting
-        SIGMOD 2022 Yao et al.    - HierGAT entity interdependence
-  [M4] Novel - dual-track fusion with learnable alpha
-"""
 import os, math, random, argparse, time
 from typing import List, Tuple, Dict, Optional, Set
 from collections import defaultdict
@@ -349,12 +335,6 @@ class IDFWeightedSignatures:
         return len(s1 & s2) / len(s1 | s2)
 
 
-# =====================================================================
-# M2: PARAMETRIC GRAPH SIMULATION (Steps 3-4) - OPTIMIZED
-# =====================================================================
-# Fast implementation: pre-computed cached signatures, capped scanning,
-# degree-adaptive thresholding. Expensive neighborhood matching removed
-# - quality filtering delegated to M3 (MultiConstraintBridge).
 
 class ParametricSimulation:
     """M2: Parametric Graph Simulation (Steps 3-4).
@@ -460,11 +440,11 @@ class ParametricSimulation:
             g_deg = gkg_degrees.get(g, 0)
             k_adapt = self._adaptive_k(g_deg)
             
-            # Step 3a: LTJ-style relation ordering (SIGMOD 2024 Arroyuelo)
+
             q_in_ordered = sorted(q_in, key=lambda r: l1_sizes.get(r, 999999))
             q_out_ordered = sorted(q_out, key=lambda r: l2_sizes.get(r, 999999))
             
-            # Step 3b-3c: Plain Jaccard candidate scanning (NO cap)
+
             candidates = {}
             g_sig = self._cached_unified(g)
             
@@ -487,7 +467,6 @@ class ParametricSimulation:
             if not candidates:
                 anchor_indices.append([]); anchor_scores.append([]); continue
             
-            # Step 4a-4c: 3-Round Progressive Parametric Simulation (ICDE 2022 Fan)
             rounds = [
                 (0.05, 2.0),
                 (0.10, 1.5),
@@ -511,7 +490,6 @@ class ParametricSimulation:
                 current_cands = {a: hv for a, hv in filtered}
                 final_cands = filtered
             
-            # Step 4d: Global consensus filter (CIKM 2021 Yang)
             if len(final_cands) > 3:
                 final_cands = self._consensus_filter(final_cands)
             
@@ -587,7 +565,6 @@ class MultiConstraintBridge:
             else:
                 w_c2 = 0.5
 
-            # --- Meta-Blocking (Papadakis ICDE 2023): per-edge constraint scores ---
             edge_scores = []
             for local_j, a_idx_val, raw_score in valid:
                 a_raw = self.idx2raw.get(a_idx_val, a_idx_val)
@@ -595,12 +572,11 @@ class MultiConstraintBridge:
                 a_sig = self.sig.unified_sig(a_raw)
                 a_idf_sum = sum(self.sig.idf.get(r, 1.0) for r in a_sig)
 
-                # C1: Degree monotonicity (ARCS-adapted)
                 w_c1 = min(1.0, g_deg / max(a_deg, 1))
-                # C3: Coverage (CBS-adapted)
+
                 inter_idf = sum(self.sig.idf.get(r, 1.0) for r in (g_sig & a_sig))
                 w_c3 = inter_idf / max(g_idf_sum, 1e-8)
-                # C4: Specificity (ECBS-adapted)
+
                 excess_idf = sum(self.sig.idf.get(r, 1.0) for r in (a_sig - g_sig))
                 w_c4 = 1.0 - excess_idf / max(a_idf_sum, 1e-8)
 
@@ -610,27 +586,24 @@ class MultiConstraintBridge:
             if len(edge_scores) < 1:
                 continue
 
-            # --- WEP (Weighted Edge Pruning, Papadakis ICDE 2023 Sec IV-B): ---
-            # Discard edges below global mean of raw M2 scores
+
             raw_scores_arr = np.array([s for _, s, _ in edge_scores])
             global_mean = raw_scores_arr.mean()
             edge_scores = [(lj, s, c) for lj, s, c in edge_scores if s >= global_mean]
             if len(edge_scores) < 1:
                 continue
 
-            # --- WNP (Weighted Node Pruning): per-tail-entity mean ---
             tail_mean = np.array([s for _, s, _ in edge_scores]).mean()
             edge_scores = [(lj, s, c) for lj, s, c in edge_scores if s >= tail_mean * 0.5]
             if len(edge_scores) < 1:
                 continue
 
-            # --- RCNP-style top-k: reciprocal constraint ---
+
             k_rcnp = max(2, min(len(edge_scores), K))  # K = max_k from M2
             edge_scores.sort(key=lambda x: x[1], reverse=True)
             edge_scores = edge_scores[:k_rcnp]
 
-            # --- Chi-squared weighted constraint fusion ---
-            # Per-constraint reliability: 1/(1+variance), stable=reliable
+
             all_cons = np.stack([c for _, _, c in edge_scores], axis=0)
             if all_cons.shape[0] >= 2:
                 cons_var = all_cons.var(axis=0)
@@ -663,22 +636,6 @@ class MultiConstraintBridge:
                 self.bridge_idx.to(raw_tails.device)[pos])
 
 
-# =====================================================================
-# =====================================================================
-# M4: PLUGGABLE ENCODER-AGNOSTIC FUSION (Step 7)
-# =====================================================================
-# Design principle (DB-style): The structural bridge (M1-M3) is a
-# "query optimizer" that works with any "execution engine" (base model).
-#
-# DAGeR = BaseKGScorer (any model: TransE, RotatE, ExeFuse, ...)
-#       + StructuralEnhancement (GMC + DomainGate + S_struct + alpha)
-#
-# Any model implementing encode() + score() + ent/rel embeddings
-# can be plugged in and immediately benefits from structural bridge signals.
-
-# ---------------------------------------------------------------------------
-# 5.1 Pluggable Base KG Scorers
-# ---------------------------------------------------------------------------
 
 class BaseKGScorer(nn.Module):
     """Abstract interface for pluggable KG embedding models.
@@ -823,9 +780,7 @@ SCORER_REGISTRY = {
     'bert': BertScorer,
 }
 
-# ---------------------------------------------------------------------------
-# 5.2 GMC Block (Sinkhorn-Knopp Mutual Consistency)
-# ---------------------------------------------------------------------------
+
 
 class GMCBlock(nn.Module):
     """Sinkhorn-Knopp normalization for mutual consistency (Yao SIGMOD 2022).
@@ -853,9 +808,6 @@ class GMCBlock(nn.Module):
         return a * torch.bmm(self._sk(adj), self.proj(x)) + (1 - a) * x
 
 
-# ---------------------------------------------------------------------------
-# 5.3 Relation-Conditioned DomainGate (HierGAT SIGMOD 2022)
-# ---------------------------------------------------------------------------
 
 class DomainGate(nn.Module):
     """HierGAT-style Multi-View Constraint Attention (Yao SIGMOD 2022).
@@ -896,17 +848,7 @@ class DomainGate(nn.Module):
         return gate_scores
 
 
-# ---------------------------------------------------------------------------
-# 5.4 Structural Enhancement Layer (DAGeR's core contribution)
-# ---------------------------------------------------------------------------
 
-
-# =====================================================================
-# INDEPENDENT STRUCTURAL SCORER (v9)
-# =====================================================================
-# A lightweight MLP that scores triples using ONLY bridge context.
-# Trained independently by SCL loss — parameters NOT shared with base scorer.
-# This prevents S_struct from collapsing into S_emb correlation.
 
 
 class StructuralEnhancement(nn.Module):
@@ -1232,9 +1174,7 @@ def evaluate(model, loader, device):
     return r
 
 
-# =====================================================================
-# PER-DEGREE-BUCKET BREAKDOWN
-# =====================================================================
+
 
 @torch.no_grad()
 def evaluate_degree_breakdown(model, loader, device, buckets=[(0, 1), (1, 2), (2, 3), (3, 5), (5, 10), (10, 10000)]):
@@ -1282,23 +1222,7 @@ def evaluate_degree_breakdown(model, loader, device, buckets=[(0, 1), (1, 2), (2
     return results
 
 
-# =====================================================================
-# MAIN PIPELINE (Phase I: Structural, Phase II: Training)
-# =====================================================================
 
-
-# =====================================================================
-# PROGRESSIVE FEEDBACK LOOP (Papadakis ICDE 2023 Sec III)
-# =====================================================================
-# M4 verification results feed back to refine M1-M3 filtering.
-# Core idea (Papadakis): the Filtering-Verification framework is iterative —
-# verification outcomes inform the next round of filtering.
-#
-# Feedback signals:
-#   1. Entity-level alpha -> M2: entities relying on structure need better anchors
-#   2. DomainGate anchor attention -> M3: frequently-used anchors get weight boost
-#   3. Constraint view attention -> M3: learned C1-C4 importance updates chi2 weights
-#   4. Per-degree F1 -> M2: low-performing degree buckets get budget increase
 
 @torch.no_grad()
 def extract_feedback(model, loader, device, bridge, ent2idx):
@@ -1504,10 +1428,7 @@ def run(name, data_dir, out_dir, dim=128, max_k=16, bs=512, epochs=40,
     t_pre_total = time.time() - t_pre
     print(f"\n  Phase I (Preprocessing): {t_pre_total:.1f}s")
 
-    # ---- Build datasets ----
-    # Training: fusion positives + random negatives (1:1 balance)
-    # Note: v4 used false_ref_triples as training negatives; v5 uses random
-    # We follow v5's simpler approach: random tail corruption
+
     all_train = fusion_train + neg_triples
     all_labels = [1] * len(fusion_train) + [0] * len(neg_triples)
 
