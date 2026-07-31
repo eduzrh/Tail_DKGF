@@ -131,7 +131,7 @@ An example dataset (**W-I-S1**) is bundled with this repository (`data/W-I-S1.zi
 
 The repository includes multi benchmark datasets
 
-**Preparation Steps**: Datasets should be placed in the repository root directory (e.g., `./W-I-S1/`, `./Y-I-S1/`).
+Preparation Steps: Datasets should be placed in the repository root directory (e.g., `./W-I-S1/`, `./Y-I-S1/`).
 ---
 
 ## 🚀 Quick Start
