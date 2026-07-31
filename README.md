@@ -127,6 +127,11 @@ An example dataset (**W-I-S1**) is bundled with this repository (`data/W-I-S1.zi
 - `ref_relative_ent_ids_2`: Ground-truth relevant entities in KG2
 - `time_id`: Time IDs (for temporal KGs)
 
+> 🔐 **Password**: `DKGF`
+
+The repository includes multi benchmark datasets
+
+**Preparation Steps**: Datasets should be placed in the repository root directory (e.g., `./W-I-S1/`, `./Y-I-S1/`).
 ---
 
 ## 🚀 Quick Start
