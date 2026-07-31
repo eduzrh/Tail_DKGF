@@ -114,7 +114,8 @@ We evaluate on six datasets from **DKGF-Bench**, covering four domains. Each dat
 | Academic   | OpenAlex-DBpedia   | OpenAlex   | DBpedia  | 2,105,340    |
 | Business   | Crunchbase-DBpedia | Crunchbase | DBpedia  | 642,109      |
 
-An example dataset (**W-I-S1**) is bundled with this repository (`data/W-I-S1.zip`). The full dataset suite follows the DKGF-Bench release; an example dataset is provided in `data/W-I-S1.zip`.
+ The full dataset suite follows the DKGF-Bench release; > 🔐 **Password**: `DKGF`.
+ Datasets should be placed in the repository root directory (e.g., `./W-I-S1/`, `./Y-I-S1/`).
 
 **Dataset format** — each dataset folder (e.g., `data/W-I-S1/`) contains:
 
@@ -126,11 +127,6 @@ An example dataset (**W-I-S1**) is bundled with this repository (`data/W-I-S1.zi
 - `false_ref_triples_1_fusion`: Hard negative triples for testing
 - `ref_relative_ent_ids_2`: Ground-truth relevant entities in KG2
 - `time_id`: Time IDs (for temporal KGs)
-
-> 🔐 **Password**: `DKGF`
-
-The repository includes multi benchmark datasets
-Datasets should be placed in the repository root directory (e.g., `./W-I-S1/`, `./Y-I-S1/`).
 
 ---
 
