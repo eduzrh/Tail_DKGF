@@ -28,9 +28,9 @@
 
 | 🆕 Updates          | 📅 Date | 📝 Description                            |
 | ------------------- | ------- | ----------------------------------------- |
-| 🎉 **Code Release** | -       | DAGR codebase and example dataset now available |
+| 🎉 **Code Release** | -       | DAGR codebase and all datasets now available |
 
-> **Before running:** After cloning, unzip the bundled example dataset: `unzip data/W-I-S1.zip -d data/`.
+> **Before running:** After cloning, extract the datasets bundled under `data/` (they are split zip archives; see the [Datasets](#-datasets) section).
 
 ---
 
@@ -114,8 +114,29 @@ We evaluate on six datasets from **DKGF-Bench**, covering four domains. Each dat
 | Academic   | OpenAlex-DBpedia   | OpenAlex   | DBpedia  | 2,105,340    |
 | Business   | Crunchbase-DBpedia | Crunchbase | DBpedia  | 642,109      |
 
- The full dataset suite follows the DKGF-Bench release; > 🔐 **Password**: `DKGF`.
- Datasets should be placed in the repository root directory (e.g., `./W-I-S1/`, `./Y-I-S1/`).
+### 📂 Data Location
+
+All datasets are included in this repository under the [`data/`](data/) folder, packaged as split zip archives:
+
+| Archive parts | Contents |
+| ------------- | -------- |
+| `data/W-I-S1.zip` + `W-I-S1.z01`–`W-I-S1.z02` | ICEWS-WIKI, split S1 |
+| `data/W-I-S2.zip` + `W-I-S2.z01`–`W-I-S2.z02` | ICEWS-WIKI, split S2 |
+| `data/Y-I-S1.zip` + `Y-I-S1.z01`–`Y-I-S1.z03` | ICEWS-YAGO, split S1 |
+| `data/Y-I-S2.zip` + `Y-I-S2.z01`–`Y-I-S2.z03` | ICEWS-YAGO, split S2 |
+| `data/otherbenchmarks.z01`–`otherbenchmarks.z08` | The remaining benchmarks (DrugBank-WIKI, UMLS-WIKI, OpenAlex-DBpedia, Crunchbase-DBpedia) |
+
+> 🔐 **Extraction password**: `DKGF`
+
+To extract a split archive, merge the parts into a single zip and unzip it, e.g. for `W-I-S1`:
+
+```bash
+cd data
+zip -s 0 W-I-S1.zip --out W-I-S1_full.zip
+unzip -P DKGF W-I-S1_full.zip -d .
+```
+
+(Equivalently, `7z x W-I-S1.zip` handles the volumes automatically.) After extraction, each dataset resides in its own folder under `data/` (e.g., `data/W-I-S1/`), which is the layout expected by all commands below.
 
 **Dataset format** — each dataset folder (e.g., `data/W-I-S1/`) contains:
 
@@ -134,10 +155,20 @@ We evaluate on six datasets from **DKGF-Bench**, covering four domains. Each dat
 
 ### Step 1: Clone the Repository 📥
 
-### Step 2: Prepare the Example Dataset 📦
+```bash
+git clone https://github.com/eduzrh/Tail_DKGF.git
+cd Tail_DKGF
+```
+
+### Step 2: Prepare the Datasets 📦
+
+All datasets ship with the repository under `data/` as split zip archives; merge and extract them first (see [Datasets](#-datasets)):
 
 ```bash
-unzip data/W-I-S1.zip -d data/
+cd data
+zip -s 0 W-I-S1.zip --out W-I-S1_full.zip
+unzip -P DKGF W-I-S1_full.zip -d .
+cd ..
 ```
 
 ### Step 3: Run the Smoke Test ▶️
